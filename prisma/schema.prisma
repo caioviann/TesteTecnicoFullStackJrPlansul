@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model categorias {
+  id        BigInt     @id @default(autoincrement())
+  nome      String     @db.VarChar(100)
+  descricao String?
+  criado_em DateTime?  @default(now()) @db.Timestamp(6)
+  produtos  produtos[]
+}
+
+model produtos {
+  id             BigInt      @id @default(autoincrement())
+  categoria_id   BigInt?
+  sku            String      @unique @db.VarChar(50)
+  nome           String      @db.VarChar(255)
+  estoque_minimo Int?        @default(0)
+  marca          String?     @default("Generico") @db.VarChar(100)
+  criado_em      DateTime?   @default(now()) @db.Timestamp(6)
+  categorias     categorias? @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

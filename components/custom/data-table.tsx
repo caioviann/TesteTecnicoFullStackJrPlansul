@@ -1,0 +1,172 @@
+"use client";
+
+import * as React from "react";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getPaginationRowModel,
+} from "@tanstack/react-table";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface DataTableProps<TData extends { id: string }, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  isLoading?: boolean;
+  filterComponent?: React.ReactNode;
+  searchComponent?: React.ReactNode;
+  actionButtons?: React.ReactNode[];
+  // TODO: Implement actual pagination logic
+  // currentPage?: number;
+  // totalPages?: number;
+  // onPageChange?: (page: number) => void;
+}
+
+export function DataTable<TData extends { id: string }, TValue>({
+  columns,
+  data,
+  onEdit,
+  onDelete,
+  isLoading = false,
+  filterComponent,
+  searchComponent,
+  actionButtons,
+}: DataTableProps<TData, TValue>) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(), // Enable pagination
+  });
+
+  const generateSkeletonRow = (columnCount: number, key: number) => (
+    <TableRow key={key}>
+      {Array.from({ length: columnCount }).map((_, colIndex) => (
+        <TableCell key={colIndex}>
+          <Skeleton className="h-6 w-full" />
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+
+  return (
+    <div>
+      <div className="flex items-center py-4 gap-2">
+        {searchComponent}
+        {filterComponent}
+        <div className="ml-auto flex gap-2">
+          {actionButtons?.map((button, index) => (
+            <React.Fragment key={index}>{button}</React.Fragment>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              // Render skeleton rows when loading
+              Array.from({ length: 5 }).map((_, index) =>
+                generateSkeletonRow(columns.length, index),
+              )
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                  {(onEdit || onDelete) && (
+                    <TableCell className="text-right">
+                      {onEdit && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => onEdit(row.original.id)} // Assuming id field exists
+                          className="mr-2"
+                        >
+                          Edit
+                        </Button>
+                      )}
+                      {onDelete && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => onDelete(row.original.id)} // Assuming id field exists
+                        >
+                          Delete
+                        </Button>
+                      )}
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+}
