@@ -48,3 +48,18 @@ Campos principais:
 - quantidade: quantidade movimentada
 - tipo: tipo da movimentação
 - criado_em: data da movimentação
+
+### Repository
+Foi realizado um CRUD padrão.
+
+### Service
+O estoque.service apenas retornado todos os estoques e o estoque de um produto em especifico.
+Já o estoque-movimentacoes.service tem mas lógicas:
+- Valida quantidade > 0
+- Verifica se o produto existe
+- Busca estoque atual (ou assume 0 se não existir)
+- Para saída: valida se há estoque suficiente
+- Calcula nova quantidade (entrada: soma, saída: subtrai)
+- Executa transação do Prisma:
+- - Cria a movimentação
+- - Atualiza ou cria o estoque com a nova quantidade
