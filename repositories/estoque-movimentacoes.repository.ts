@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import { estoque_movimentacoes, tipo_movimentacao } from '@/generated/prisma/client';
+import { estoque_movimentacoes, $Enums } from '@/generated/prisma/client';
 
 export const findAll = async (): Promise<estoque_movimentacoes[]> => {
   return prisma.estoque_movimentacoes.findMany({
@@ -35,7 +35,7 @@ export const findByProdutoId = async (produto_id: bigint): Promise<estoque_movim
 export const create = async (data: {
   produto_id: bigint;
   quantidade: number;
-  tipo: tipo_movimentacao;
+  tipo: $Enums.tipo_movimentacao;
 }): Promise<estoque_movimentacoes> => {
   return prisma.estoque_movimentacoes.create({
     data,
