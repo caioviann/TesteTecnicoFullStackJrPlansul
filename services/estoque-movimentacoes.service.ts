@@ -1,8 +1,6 @@
 import * as repository from '@/repositories/estoque-movimentacoes.repository';
-import * as estoqueRepository from '@/repositories/estoque.repository';
-import * as produtosRepository from '@/repositories/produtos.repository';
-import prisma from '@/lib/db';
 import { estoque_movimentacoes, $Enums } from '@/generated/prisma/client';
+import prisma from '@/lib/db';
 
 export const getAllMovimentacoes = async (): Promise<estoque_movimentacoes[]> => {
   return repository.findAll();
@@ -17,43 +15,36 @@ export const createMovimentacao = async (data: {
   quantidade: number;
   tipo: $Enums.tipo_movimentacao;
 }): Promise<estoque_movimentacoes> => {
-  const { produto_id, quantidade, tipo } = data;
+  const { produto_id: rawProdutoId, quantidade, tipo } = data;
 
-  // Validar quantidade
-  if (quantidade <= 0) {
-    throw new Error('Quantidade deve ser maior que zero');
-  }
+  const result = await prisma.$transaction(async (tx) => {
+    const produto_id = typeof rawProdutoId === 'bigint' ? rawProdutoId : BigInt(rawProdutoId as any);
 
-  // Verificar se o produto existe
-  const produto = await produtosRepository.findById(produto_id);
-  if (!produto) {
-    throw new Error('Produto não encontrado');
-  }
+    const existingEstoque = await tx.estoque.findUnique({ where: { produto_id } });
+    const currentQuantidade = existingEstoque ? Number(existingEstoque.quantidade) : 0;
+    const delta = tipo === 'entrada' ? Number(quantidade) : -Number(quantidade);
+    const newQuantidade = currentQuantidade + delta;
 
-  // Buscar estoque atual do produto
-  const estoqueAtual = await estoqueRepository.findByProdutoId(produto_id);
-  const quantidadeAtual = estoqueAtual?.quantidade || 0;
-
-  // Validar saída: verificar se há estoque suficiente
-  if (tipo === $Enums.tipo_movimentacao.saida) {
-    if (quantidadeAtual < quantidade) {
-      throw new Error(`Estoque insuficiente. Disponível: ${quantidadeAtual}, Solicitado: ${quantidade}`);
+    if (newQuantidade < 0) {
+      throw new Error('Quantidade em estoque não pode ficar negativa');
     }
-  }
 
-  // Calcular nova quantidade
-  const novaQuantidade =
-    tipo === $Enums.tipo_movimentacao.entrada
-      ? quantidadeAtual + quantidade
-      : quantidadeAtual - quantidade;
+    await tx.estoque.upsert({
+      where: { produto_id },
+      update: {
+        quantidade: newQuantidade,
+        atualizado_em: new Date(),
+      },
+      create: {
+        produto_id,
+        quantidade: newQuantidade,
+      },
+    });
 
-  // Executar transação: criar movimentação e atualizar estoque
-  return prisma.$transaction(async (tx) => {
-    // Criar movimentação
     const movimentacao = await tx.estoque_movimentacoes.create({
       data: {
         produto_id,
-        quantidade,
+        quantidade: Number(quantidade),
         tipo,
       },
       include: {
@@ -65,19 +56,8 @@ export const createMovimentacao = async (data: {
       },
     });
 
-    // Atualizar ou criar estoque
-    await tx.estoque.upsert({
-      where: { produto_id },
-      update: {
-        quantidade: novaQuantidade,
-        atualizado_em: new Date(),
-      },
-      create: {
-        produto_id,
-        quantidade: novaQuantidade,
-      },
-    });
-
     return movimentacao;
   });
+
+  return result;
 };
