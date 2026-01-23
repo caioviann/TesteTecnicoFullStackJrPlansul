@@ -14,8 +14,12 @@ export async function GET() {
     });
     return NextResponse.json(movimentacoesSerialized);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Falha ao buscar movimentações' }, { status: 500 });
+    console.error('Erro ao buscar movimentações:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return NextResponse.json(
+      { error: 'Falha ao buscar movimentações', details: errorMessage },
+      { status: 500 }
+    );
   }
 }
 

@@ -13,7 +13,11 @@ export async function GET() {
     });
     return NextResponse.json(estoqueSerialized);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Falha ao buscar estoque' }, { status: 500 });
+    console.error('Erro ao buscar estoque:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+    return NextResponse.json(
+      { error: 'Falha ao buscar estoque', details: errorMessage },
+      { status: 500 }
+    );
   }
 }
