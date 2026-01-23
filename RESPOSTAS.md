@@ -63,3 +63,19 @@ Já o estoque-movimentacoes.service tem mas lógicas:
 - Executa transação do Prisma:
 - - Cria a movimentação
 - - Atualiza ou cria o estoque com a nova quantidade
+
+### API Routes
+#### estoque/route.ts
+- GET: lista todos os estoques com informações do produto e categoria
+- Serializa BigInt para string
+- Tratamento de erros
+
+#### estoque-movimentacoes/route.ts
+- GET: lista todas as movimentações ordenadas por - - data (mais recente primeiro)
+- POST: cria nova movimentação com validações:
+- Valida produto_id obrigatório
+- Valida quantidade > 0
+- Valida tipo como "entrada" ou "saida"
+- Converte produto_id para BigInt
+- Usa o enum do Prisma ($Enums.tipo_movimentacao)
+- Retorna mensagens de erro do service (ex: "Estoque insuficiente")
