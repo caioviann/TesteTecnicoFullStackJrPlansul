@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as service from '@/services/produtos.service';
-
+//Parte 1 do teste técnico
 export async function GET() {
  try {
     const produtos = await service.getAllProdutos();
@@ -14,7 +14,7 @@ export async function GET() {
     return NextResponse.json(produtosSerialized);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Falha ao buscar produtos' }, { status: 500 });
+    return NextResponse.json({ error: 'falha ao buscar produtos' }, { status: 500 });
   }
 }
 
