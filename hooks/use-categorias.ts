@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as z from "zod";
 
-// Zod Schemas
+
 export const createCategoriaSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
   descricao: z.string().optional(),
@@ -13,9 +13,9 @@ export const updateCategoriaSchema = z.object({
   descricao: z.string().optional(),
 });
 
-// Types
+
 export type Categoria = {
-  id: string; // Prisma BigInt is serialized as string
+  id: string; 
   nome: string;
   descricao: string | null;
   criado_em: string;
@@ -25,7 +25,6 @@ export type CreateCategoriaPayload = z.infer<typeof createCategoriaSchema>;
 
 export type UpdateCategoriaPayload = z.infer<typeof updateCategoriaSchema>;
 
-// API Functions
 const fetchCategories = async (): Promise<Categoria[]> => {
   const response = await fetch("/api/categorias");
   if (!response.ok) {
