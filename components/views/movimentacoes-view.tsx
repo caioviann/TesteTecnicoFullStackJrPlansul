@@ -16,7 +16,6 @@ export function MovimentacoesView() {
   const [searchText, setSearchText] = useState("");
   const [selectedTipos, setSelectedTipos] = useState<Set<string>>(new Set());
 
-  // Filtrar e buscar movimentações
   const filteredMovimentacoes = useMemo(() => {
     if (!movimentacoes) return [];
 
@@ -35,7 +34,6 @@ export function MovimentacoesView() {
     });
   }, [movimentacoes, searchText, selectedTipos]);
 
-  // Extrair opções de tipos
   const tipoOptions = useMemo(() => {
     const tipoMap = new Map<string, number>();
     movimentacoes?.forEach((mov) => {

@@ -17,8 +17,6 @@ export function EstoqueView() {
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     new Set()
   );
-
-  // Filtrar e buscar estoque
   const filteredEstoque = useMemo(() => {
     if (!estoque) return [];
 
@@ -39,7 +37,6 @@ export function EstoqueView() {
     });
   }, [estoque, searchText, selectedCategories]);
 
-  // Extrair opções de categorias
   const categoryOptions = useMemo(() => {
     const categoryMap = new Map<string, number>();
     estoque?.forEach((item) => {

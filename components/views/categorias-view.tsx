@@ -37,7 +37,6 @@ export function CategoriasView() {
     setIsDeleteModalOpen(true);
   };
 
-  // Filtrar e buscar categorias
   const filteredCategories = useMemo(() => {
     if (!categories) return [];
 

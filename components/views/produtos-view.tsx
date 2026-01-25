@@ -44,24 +44,20 @@ export function ProdutosView() {
     setIsDeleteModalOpen(true);
   };
 
-  // Filtrar e buscar produtos
   const filteredProdutos = useMemo(() => {
     if (!produtos) return [];
 
     return produtos.filter((produto) => {
-      // Busca por nome ou SKU
       const searchLower = searchText.toLowerCase().trim();
       const matchesSearch =
         searchLower === "" ||
         produto.nome.toLowerCase().includes(searchLower) ||
         produto.sku.toLowerCase().includes(searchLower);
 
-      // Filtro por categoria
       const matchesCategory =
         selectedCategories.size === 0 ||
         selectedCategories.has(produto.categoria_id || "null");
 
-      // Filtro por marca
       const matchesMarca =
         selectedMarcas.size === 0 ||
         selectedMarcas.has(produto.marca || "Generico");
@@ -70,7 +66,6 @@ export function ProdutosView() {
     });
   }, [produtos, searchText, selectedCategories, selectedMarcas]);
 
-  // Extrair opções de categorias
   const categoryOptions = useMemo(() => {
     const categoryMap = new Map<string, number>();
     produtos?.forEach((p) => {
@@ -87,7 +82,6 @@ export function ProdutosView() {
       : [];
   }, [categories, produtos]);
 
-  // Extrair opções de marcas
   const marcaOptions = useMemo(() => {
     const marcaMap = new Map<string, number>();
     produtos?.forEach((p) => {
