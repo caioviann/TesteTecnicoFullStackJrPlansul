@@ -597,22 +597,6 @@ curl -X POST http://localhost:3000/api/estoque-movimentacoes \
 
 ---
 
-## Notas Importantes
-
-1. **BigInt Serialization:** IDs são retornados como strings para compatibilidade com JSON, pois o banco de dados usa BigInt.
-
-2. **Timestamp Automático:** Os campos `criado_em` e `atualizado_em` são preenchidos automaticamente pelo servidor com a data/hora atual.
-
-3. **Estoque Automático:** Quando um produto é criado, um registro de estoque é criado automaticamente com quantidade 0.
-
-4. **Movimentações:** A quantidade em estoque só deve ser modificada através de movimentações. Não há endpoint direto para atualizar a quantidade no estoque.
-
-5. **Exclusão em Cascata:** Ao deletar um produto, todas as suas movimentações de estoque são deletadas automaticamente.
-
-6. **Validação de Unicidade:** O campo `sku` de produtos é único e não pode ser duplicado.
-
----
-
 ## Exemplos Práticos com JavaScript/Fetch
 
 ### Criar Produto
@@ -672,10 +656,3 @@ registrarMovimentacao({
 ```
 
 ---
-
-## Suporte
-
-Para dúvidas ou problemas com a API, verifique:
-- Os logs do servidor (`console.error`)
-- A validação dos dados enviados
-- A disponibilidade do banco de dados PostgreSQL

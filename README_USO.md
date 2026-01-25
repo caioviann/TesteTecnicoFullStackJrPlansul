@@ -4,18 +4,6 @@ Guia completo para configurar, executar e utilizar a aplicação de Controle de 
 
 ---
 
-## 📋 Índice
-
-1. [Requisitos do Sistema](#requisitos-do-sistema)
-2. [Configuração Inicial](#configuração-inicial)
-3. [Executando a Aplicação](#executando-a-aplicação)
-4. [Estrutura do Projeto](#estrutura-do-projeto)
-5. [Funcionalidades Principais](#funcionalidades-principais)
-6. [Guia de Uso da Interface](#guia-de-uso-da-interface)
-7. [Troubleshooting](#troubleshooting)
-
----
-
 ## 🔧 Requisitos do Sistema
 
 ### Dependências Globais
@@ -155,66 +143,6 @@ npm run dev
   - Local:        http://localhost:3000
 ```
 
-### Modo Produção
-
-1. Compile o projeto:
-
-```bash
-npm run build
-```
-
-2. Inicie o servidor:
-
-```bash
-npm start
-```
-
-### Acessar a Aplicação
-
-Abra seu navegador e acesse:
-
-```
-http://localhost:3000
-```
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-junior-technical-assessment/
-├── app/
-│   ├── api/                    # Endpoints da API
-│   │   ├── categorias/
-│   │   ├── produtos/
-│   │   ├── estoque/
-│   │   └── estoque-movimentacoes/
-│   ├── layout.tsx              # Layout principal
-│   ├── page.tsx                # Página inicial
-│   ├── providers.tsx           # Context e providers
-│   └── globals.css             # Estilos globais
-├── components/
-│   ├── views/                  # Componentes de página
-│   ├── categorias/             # Componentes de categoria
-│   ├── produtos/               # Componentes de produtos
-│   ├── estoque/                # Componentes de estoque
-│   ├── custom/                 # Componentes reutilizáveis
-│   └── ui/                     # Componentes UI base
-├── hooks/                      # React Custom Hooks
-├── services/                   # Lógica de negócio
-├── repositories/               # Acesso a dados
-├── lib/                        # Utilitários
-├── prisma/
-│   └── schema.prisma           # Schema do banco
-├── public/                     # Assets estáticos
-├── sql/                        # Scripts SQL
-├── package.json
-├── tsconfig.json
-├── next.config.ts
-├── README_API.md               # Documentação das APIs
-└── README_USO.md               # Este arquivo
-```
-
 ### Principais Pastas
 
 - **`app/api/`**: Endpoints REST da aplicação
@@ -222,78 +150,6 @@ junior-technical-assessment/
 - **`services/`**: Lógica de negócio (regras, transformações)
 - **`repositories/`**: Operações diretas com banco de dados
 - **`hooks/`**: Custom hooks React com React Query
-
----
-
-## ✨ Funcionalidades Principais
-
-### 1. Gerenciamento de Categorias
-
-**Ações Disponíveis:**
-- ✅ Listar categorias
-- ✅ Criar nova categoria
-- ✅ Editar categoria existente
-- ✅ Deletar categoria
-
-**Acesso:**
-- Interface: Aba "Categorias"
-- API: `/api/categorias`
-
----
-
-### 2. Gerenciamento de Produtos
-
-**Ações Disponíveis:**
-- ✅ Listar produtos com filtros
-- ✅ Criar novo produto
-- ✅ Editar produto existente
-- ✅ Deletar produto
-- ✅ Filtrar por categoria
-- ✅ Buscar por nome/SKU
-
-**Campos de Produto:**
-- `SKU`: Código único do produto
-- `Nome`: Nome do produto
-- `Categoria`: Categoria associada
-- `Marca`: Fabricante
-- `Estoque Mínimo`: Quantidade mínima recomendada
-
-**Acesso:**
-- Interface: Aba "Produtos"
-- API: `/api/produtos`
-
----
-
-### 3. Controle de Estoque
-
-**Estado do Estoque:**
-- ✅ Visualizar quantidade atual de cada produto
-- ✅ Ver data da última atualização
-
-**Acesso:**
-- Interface: Aba "Estado do Estoque"
-- API: `/api/estoque`
-
----
-
-### 4. Movimentações de Estoque
-
-**Ações Disponíveis:**
-- ✅ Registrar entrada de estoque
-- ✅ Registrar saída de estoque
-- ✅ Visualizar histórico de movimentações
-- ✅ Filtrar por tipo (entrada/saída)
-- ✅ Ver data e hora da movimentação
-
-**Campos de Movimentação:**
-- `Produto`: Qual produto foi movimentado
-- `Quantidade`: Número de itens
-- `Tipo`: "Entrada" ou "Saída"
-- `Data/Hora`: Quando foi feito
-
-**Acesso:**
-- Interface: Aba "Histórico de Movimentações"
-- API: `/api/estoque-movimentacoes`
 
 ---
 
@@ -432,74 +288,6 @@ Ao acessar a aplicação, você verá 4 abas principais:
 
 ---
 
-## 🔧 Desenvolvimento
-
-### Estrutura de Dados - Hooks
-
-O projeto usa React Query para gerenciar estado e cache de dados:
-
-```typescript
-// Exemplo de uso em um componente
-import { useProdutos } from '@/hooks/use-produtos';
-
-export function MeuComponente() {
-  const { data: produtos, isLoading, error } = useProdutos();
-  
-  if (isLoading) return <p>Carregando...</p>;
-  if (error) return <p>Erro ao carregar</p>;
-  
-  return (
-    <ul>
-      {produtos?.map(p => <li key={p.id}>{p.nome}</li>)}
-    </ul>
-  );
-}
-```
-
-### Formulários
-
-O projeto usa React Hook Form com validação Zod:
-
-```typescript
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const schema = z.object({
-  nome: z.string().min(1, 'Nome é obrigatório'),
-  descricao: z.string().optional(),
-});
-
-export function MinhaForm() {
-  const form = useForm({ resolver: zodResolver(schema) });
-  
-  return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      {/* formulário */}
-    </form>
-  );
-}
-```
-
-### Chamadas de API
-
-As chamadas à API são feitas através dos hooks em `/hooks/`:
-
-```typescript
-// Exemplo: useProdutos
-export function useProdutos() {
-  return useQuery({
-    queryKey: ['produtos'],
-    queryFn: async () => {
-      const response = await fetch('/api/produtos');
-      return response.json();
-    },
-  });
-}
-```
-
----
-
 ## 🐛 Troubleshooting
 
 ### Problema: "Cannot find module '@/...'"
@@ -577,18 +365,6 @@ npm install
 
 ---
 
-## 📝 Logs e Debugging
-
-### Ver Logs do Servidor
-
-Os logs são exibidos no console ao executar `npm run dev`:
-
-```
-[API] GET /api/produtos → 200 OK
-[API] POST /api/estoque-movimentacoes → 201 Created
-[Error] Database query failed: connection timeout
-```
-
 ### Verificar Dados no Prisma Studio
 
 ```bash
@@ -608,41 +384,12 @@ DATABASE_URL="postgresql://user:pass@host/db?logging=true"
 
 ---
 
-## 🚢 Deployment
-
-### Preparar para Produção
-
-1. Build da aplicação:
-```bash
-npm run build
-```
-
-2. Executar migrações no banco:
-```bash
-npx prisma migrate deploy
-```
-
-3. Iniciar servidor:
-```bash
-npm start
-```
-
 ### Variáveis de Ambiente em Produção
 
 Certifique-se de configurar:
 - `DATABASE_URL`: URL do banco de dados em produção
 - `NODE_ENV=production`
 - Qualquer outra variável específica do ambiente
-
----
-
-## 📞 Suporte e Documentação
-
-- **Documentação da API**: Veja [README_API.md](README_API.md)
-- **Prisma ORM**: https://www.prisma.io/docs/
-- **Next.js**: https://nextjs.org/docs
-- **React Query**: https://tanstack.com/query/latest
-- **React Hook Form**: https://react-hook-form.com/
 
 ---
 
@@ -658,7 +405,3 @@ Certifique-se de configurar:
 - [ ] Servidor iniciado: `npm run dev`
 - [ ] Navegador aberto em `http://localhost:3000`
 - [ ] Todas as abas aparecem e funcionam
-
----
-
-Parabéns! Você está pronto para usar a aplicação! 🎉
