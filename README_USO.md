@@ -1,407 +1,66 @@
-# Documentação de Uso do Projeto
+# Guia Rápido de Execução
 
-Guia completo para configurar, executar e utilizar a aplicação de Controle de Categorias, Produtos e Estoque.
+## Requisitos
 
----
+- **Node.js** v18.0.0 ou superior
+- **npm** v9.0.0 ou superior
+- **PostgreSQL** v12.0 ou superior (ou Docker)
 
-## 🔧 Requisitos do Sistema
+## Passo a Passo
 
-### Dependências Globais
-
-- **Node.js:** v18.0.0 ou superior
-- **npm:** v9.0.0 ou superior (ou yarn/pnpm)
-- **PostgreSQL:** v12.0 ou superior
-- **Git:** para clonar o repositório (opcional)
-
-### Como Verificar Versões Instaladas
-
-```bash
-node --version
-npm --version
-psql --version
-```
-
----
-
-## ⚙️ Configuração Inicial
-
-### Passo 1: Clonar/Abrir o Projeto
-
-```bash
-cd /Users/caiohenrique/Documents/Dev/TesteTecnico/PlansulNodeReact/junior-technical-assessment
-```
-
-### Passo 2: Instalar Dependências
+### 1. Instalar Dependências
 
 ```bash
 npm install
 ```
 
-Este comando irá:
-- Instalar todas as dependências do `package.json`
-- Configurar o Prisma ORM
-- Gerar os tipos TypeScript
+### 2. Configurar Variáveis de Ambiente
 
-### Passo 3: Configurar Variáveis de Ambiente
-
-1. Crie um arquivo `.env` na raiz do projeto:
-
-```bash
-touch .env
-```
-
-2. Configure as variáveis necessárias. Exemplo para desenvolvimento local:
+Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-# Banco de Dados PostgreSQL
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_banco"
-
-# Porta do Next.js (opcional, padrão: 3000)
-PORT=3000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/postgres"
 ```
 
-**Exemplo Completo com Valores Padrão:**
+### 3. Iniciar o Banco de Dados
 
-```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tecnico"
-NODE_ENV=development
-```
-
-### Passo 4: Preparar o Banco de Dados
-
-#### Opção A: Com Docker Compose (Recomendado)
-
-O projeto possui um `docker-compose.yml` pré-configurado:
+**Opção A: Com Docker (Recomendado)**
 
 ```bash
 docker-compose up -d
 ```
 
-Este comando irá:
-- Criar um container PostgreSQL
-- Usar as variáveis do arquivo `docker-compose.yml`
-- Inicializar o banco de dados
-
-#### Opção B: PostgreSQL Local
-
-Se você tem PostgreSQL instalado localmente:
-
-1. Crie um banco de dados:
+**Opção B: PostgreSQL Local**
 
 ```bash
 createdb test_tecnico
 ```
 
-2. Atualize a `DATABASE_URL` no `.env`:
-
-```env
-DATABASE_URL="postgresql://seu_usuario:sua_senha@localhost:5432/test_tecnico"
-```
-
-### Passo 5: Executar Migrações do Prisma
+### 4. Executar Migrações
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-Este comando irá:
-- Gerar as tabelas no banco de dados
-- Executar os scripts SQL do projeto
-- Atualizar os tipos Prisma
-
-Se tiver um arquivo `sql/init.sql`, ele será executado automaticamente.
-
-### Passo 6: Gerar Cliente Prisma
-
-```bash
-npx prisma generate
-```
-
-Esto atualiza os tipos e o cliente Prisma.
-
----
-
-## 🚀 Executando a Aplicação
-
-### Modo Desenvolvimento
+### 5. Iniciar a Aplicação
 
 ```bash
 npm run dev
 ```
 
-**O que acontece:**
-- O servidor Next.js inicia em `http://localhost:3000`
-- O código é recarregado automaticamente ao fazer alterações
-- Erros são exibidos no console
+Acesse: **http://localhost:3000**
 
-**Saída esperada:**
-```
-> dev
-> next dev
+## Funcionalidades
 
-  ▲ Next.js 16.1.2
-  - Local:        http://localhost:3000
-```
+- **Categorias**: Criar, editar, deletar e listar categorias
+- **Produtos**: Gerenciar produtos com SKU, nome, marca e categoria
+- **Estoque**: Consultar quantidade de produtos em estoque
+- **Movimentações**: Registrar entradas e saídas de estoque
 
-### Principais Pastas
+### Filtros e Busca
 
-- **`app/api/`**: Endpoints REST da aplicação
-- **`components/`**: Componentes React reutilizáveis
-- **`services/`**: Lógica de negócio (regras, transformações)
-- **`repositories/`**: Operações diretas com banco de dados
-- **`hooks/`**: Custom hooks React com React Query
-
----
-
-## 📱 Guia de Uso da Interface
-
-### Tela Inicial
-
-Ao acessar a aplicação, você verá 4 abas principais:
-
-1. **Categorias** - Gerenciar categorias de produtos
-2. **Produtos** - Listar e gerenciar produtos
-3. **Estado do Estoque** - Ver quantidade de itens em estoque
-4. **Histórico de Movimentações** - Ver histórico de entradas/saídas
-
-### Navegação
-
-- **Menu de Abas**: Clique nas abas no topo para alternar entre seções
-- **Tema**: Use o toggle de tema (canto superior) para alternar entre modo claro/escuro
-
----
-
-### 1️⃣ Trabalhar com Categorias
-
-#### Listar Categorias
-- Abra a aba "Categorias"
-- A tabela exibe: ID, Nome, Descrição, Data de Criação
-
-#### Criar Categoria
-- Clique no botão "Adicionar Categoria" (ou "+" verde)
-- Preencha o formulário:
-  - **Nome** (obrigatório): ex. "Eletrônicos"
-  - **Descrição** (opcional): ex. "Produtos eletrônicos diversos"
-- Clique em "Salvar"
-
-#### Editar Categoria
-- Localize a categoria na tabela
-- Clique no botão de edição (ícone de lápis)
-- Altere os dados desejados
-- Clique em "Atualizar"
-
-#### Deletar Categoria
-- Localize a categoria na tabela
-- Clique no botão de exclusão (ícone de lixeira)
-- Confirme a exclusão no diálogo
-
----
-
-### 2️⃣ Trabalhar com Produtos
-
-#### Listar Produtos
-- Abra a aba "Produtos"
-- A tabela exibe: ID, SKU, Nome, Categoria, Marca, Estoque Mínimo, Data de Criação
-
-#### Buscar/Filtrar Produtos
-- Use o campo de busca para procurar por nome ou SKU
-- Selecione uma categoria no filtro de categoria (se disponível)
-- A tabela é atualizada em tempo real
-
-#### Criar Produto
-- Clique no botão "Adicionar Produto" (ou "+" verde)
-- Preencha o formulário:
-  - **SKU** (obrigatório): Código único como "ELET-001"
-  - **Nome** (obrigatório): "Teclado Mecânico"
-  - **Categoria**: Selecione uma categoria existente (opcional)
-  - **Marca**: "Razer" ou "Genérico" (opcional)
-  - **Estoque Mínimo**: Quantidade mínima desejada (opcional)
-- Clique em "Salvar"
-
-#### Editar Produto
-- Localize o produto na tabela
-- Clique no botão de edição (ícone de lápis)
-- Altere os dados desejados
-- Clique em "Atualizar"
-
-#### Deletar Produto
-- Localize o produto na tabela
-- Clique no botão de exclusão (ícone de lixeira)
-- Confirme a exclusão no diálogo
-
-> ⚠️ **Nota**: Ao deletar um produto, todas as suas movimentações de estoque serão deletadas.
-
----
-
-### 3️⃣ Consultar Estado do Estoque
-
-#### Visualizar Estoque
-- Abra a aba "Estado do Estoque"
-- A tabela exibe:
-  - **ID do Estoque**: Identificador único
-  - **Produto**: Nome do produto
-  - **Quantidade**: Quantidade atual em estoque
-  - **Última Atualização**: Data/hora da última movimentação
-
-#### Interpretar os Dados
-- Quantidade 0 = Produto sem estoque
-- Última Atualização = Quando foi feita a última entrada ou saída
-
-> 💡 **Dica**: O estoque é atualizado automaticamente quando você registra uma movimentação.
-
----
-
-### 4️⃣ Registrar Movimentações de Estoque
-
-#### Listar Movimentações
-- Abra a aba "Histórico de Movimentações"
-- A tabela exibe:
-  - **ID**: Identificador único
-  - **Produto**: Nome do produto
-  - **Tipo**: "Entrada" ou "Saída"
-  - **Quantidade**: Número de itens
-  - **Data/Hora**: Quando foi registrada
-
-#### Registrar Entrada de Estoque
-- Clique no botão "Adicionar Movimentação" (ou "+" verde)
-- No formulário:
-  - **Tipo**: Selecione "Entrada"
-  - **Produto**: Escolha o produto
-  - **Quantidade**: Digite a quantidade (ex: 10)
-- Clique em "Salvar"
-- A quantidade do produto no estoque aumentará
-
-#### Registrar Saída de Estoque
-- Clique no botão "Adicionar Movimentação" (ou "+" verde)
-- No formulário:
-  - **Tipo**: Selecione "Saída"
-  - **Produto**: Escolha o produto
-  - **Quantidade**: Digite a quantidade (ex: 5)
-- Clique em "Salvar"
-- A quantidade do produto no estoque diminuirá
-
-#### Filtrar Movimentações
-- Use os filtros disponíveis para:
-  - Buscar por produto
-  - Filtrar por tipo (Entrada/Saída)
-  - Ver movimentações em um período
-
----
-
-## 🐛 Troubleshooting
-
-### Problema: "Cannot find module '@/...'"
-
-**Solução:**
-- Verifique o arquivo `tsconfig.json` - deve ter paths configurados
-- Execute `npm install` novamente
-- Reinicie o servidor de desenvolvimento
-
-### Problema: "Database connection failed"
-
-**Solução:**
-```bash
-# Verificar se PostgreSQL está rodando
-psql -U postgres -h localhost
-
-# Ou com Docker:
-docker-compose ps
-
-# Se não estiver rodando:
-docker-compose up -d
-```
-
-### Problema: "Prisma migrations failed"
-
-**Solução:**
-```bash
-# Resetar banco de dados (⚠️ apaga tudo)
-npx prisma migrate reset
-
-# Ou ver status das migrações
-npx prisma migrate status
-
-# Gerar cliente novamente
-npx prisma generate
-```
-
-### Problema: "Port 3000 is already in use"
-
-**Solução:**
-```bash
-# Matar processo na porta 3000 (macOS/Linux)
-lsof -ti:3000 | xargs kill -9
-
-# Ou usar outra porta
-PORT=3001 npm run dev
-```
-
-### Problema: Estilos não estão carregando
-
-**Solução:**
-```bash
-# Reconstruir Tailwind CSS
-npm run build
-
-# Ou limpar cache
-rm -rf .next
-npm run dev
-```
-
-### Problema: Erro "EACCES: permission denied"
-
-**Solução:**
-```bash
-# Verificar permissões
-ls -la package.json
-
-# Se necessário, atualizar permissões
-chmod 644 package.json
-
-# Ou reinstalar node_modules
-rm -rf node_modules package-lock.json
-npm install
-```
-
----
-
-### Verificar Dados no Prisma Studio
-
-```bash
-npx prisma studio
-```
-
-Abre uma interface web em `http://localhost:5555` para visualizar e editar dados diretamente.
-
-### Logs do Banco de Dados
-
-Para ver queries SQL executadas:
-
-```bash
-# No arquivo .env
-DATABASE_URL="postgresql://user:pass@host/db?logging=true"
-```
-
----
-
-### Variáveis de Ambiente em Produção
-
-Certifique-se de configurar:
-- `DATABASE_URL`: URL do banco de dados em produção
-- `NODE_ENV=production`
-- Qualquer outra variável específica do ambiente
-
----
-
-## ✅ Checklist de Primeiro Uso
-
-- [ ] Node.js e npm instalados
-- [ ] PostgreSQL instalado ou Docker disponível
-- [ ] Projeto clonado/aberto
-- [ ] `npm install` executado
-- [ ] `.env` configurado com `DATABASE_URL`
-- [ ] PostgreSQL iniciado (local ou Docker)
-- [ ] Migrações executadas: `npx prisma migrate dev --name init`
-- [ ] Servidor iniciado: `npm run dev`
-- [ ] Navegador aberto em `http://localhost:3000`
-- [ ] Todas as abas aparecem e funcionam
+- **Buscar**: Digite nome ou SKU de produtos
+- **Filtrar por Categoria**: Selecione uma ou mais categorias
+- **Filtrar por Marca**: Disponível em produtos
+- **Filtrar por Tipo de Movimentação**: Entrada ou Saída
+- **Ordenar**: Clique no cabeçalho de qualquer coluna para ordenar

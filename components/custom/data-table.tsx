@@ -7,6 +7,8 @@ import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 
 import {
@@ -19,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowUpDown } from "lucide-react";
 
 interface DataTableProps<TData extends { id: string }, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,11 +48,18 @@ export function DataTable<TData extends { id: string }, TValue>({
   searchComponent,
   actionButtons,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(), // Enable pagination
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   const generateSkeletonRow = (columnCount: number, key: number) => (
@@ -80,13 +90,21 @@ export function DataTable<TData extends { id: string }, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                    <TableHead key={header.id} className="cursor-pointer select-none">
+                      <div
+                        className="flex items-center gap-2"
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                        {header.column.getCanSort() && (
+                          <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+                        )}
+                      </div>
                     </TableHead>
                   );
                 })}

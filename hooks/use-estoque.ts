@@ -5,10 +5,10 @@ import * as z from "zod";
 export const createMovimentacaoSchema = z.object({
   produto_id: z.string().min(1, "Produto é obrigatório"),
   quantidade: z.coerce.number().int().min(1, "quantidade deve ser maior que zero"),
-  tipo: z.enum(["entrada", "saida"], {
-    required_error: "tipo é obrigatório",
-    invalid_type_error: "tipo deve ser 'entrada' ou 'saida'",
-  }),
+  tipo: z.enum(["entrada", "saida"]).refine(
+    (value) => ["entrada", "saida"].includes(value),
+    { message: "tipo deve ser 'entrada' ou 'saida'" }
+  ),
 });
 
 // Types

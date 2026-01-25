@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCategories, Categoria } from "@/hooks/use-categorias";
 import { DataTable } from "@/components/custom/data-table";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { categoriaColumns } from "@/components/categorias/categoria-columns";
 import { AddCategoryModal } from "@/components/categorias/categoria-add-modal";
 import { EditCategoryModal } from "@/components/categorias/categoria-edit-modal";
 import { DeleteCategoryDialog } from "@/components/categorias/categoria-delete-dialog";
+import { FilterPopover } from "@/components/custom/filter-popover";
 
 export function CategoriasView() {
   const { data: categories, isLoading, isError, error } = useCategories();
@@ -21,6 +22,7 @@ export function CategoriasView() {
   const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(
     null,
   );
+  const [searchText, setSearchText] = useState("");
 
   const handleEdit = (id: string) => {
     const categoryToEdit = categories?.find((cat) => cat.id === id);
@@ -35,6 +37,22 @@ export function CategoriasView() {
     setIsDeleteModalOpen(true);
   };
 
+  // Filtrar e buscar categorias
+  const filteredCategories = useMemo(() => {
+    if (!categories) return [];
+
+    const searchLower = searchText.toLowerCase().trim();
+
+    return categories.filter((categoria) => {
+      return (
+        searchLower === "" ||
+        categoria.nome.toLowerCase().includes(searchLower) ||
+        (categoria.descricao &&
+          categoria.descricao.toLowerCase().includes(searchLower))
+      );
+    });
+  }, [categories, searchText]);
+
   if (isError) {
     return (
       <div className="text-red-500">
@@ -47,12 +65,17 @@ export function CategoriasView() {
     <>
       <DataTable
         columns={categoriaColumns}
-        data={categories || []}
+        data={filteredCategories}
         onEdit={handleEdit}
         onDelete={handleDelete}
         isLoading={isLoading}
         searchComponent={
-          <Input placeholder="Buscar categorias..." className="max-w-sm" />
+          <Input
+            placeholder="Buscar por nome ou descrição..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="max-w-sm"
+          />
         }
         actionButtons={[
           <Button key="new-category" onClick={() => setIsAddModalOpen(true)}>
